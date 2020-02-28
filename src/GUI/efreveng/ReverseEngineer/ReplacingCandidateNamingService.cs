@@ -7,17 +7,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace ReverseEngineer20.ReverseEngineer
 {
     public class ReplacingCandidateNamingService : CandidateNamingService
     {
+        private readonly ReverseEngineerCommandOptions _customOptions;
         private readonly List<Schema> _customNameOptions;
 
-        public ReplacingCandidateNamingService(List<Schema> customNameOptions)
+        public ReplacingCandidateNamingService(ReverseEngineerCommandOptions options)
         {
-            _customNameOptions = customNameOptions;
+            _customOptions = options;
+            _customNameOptions = options.CustomReplacers;
         }
+
 
         public override string GenerateCandidateIdentifier(DatabaseTable originalTable)
         {
@@ -68,10 +72,10 @@ namespace ReverseEngineer20.ReverseEngineer
 
         public override string GenerateCandidateIdentifier(DatabaseColumn originalColumn)
         {
-            string temp = string.Empty;
+            var temp = String.Empty;
             var candidateStringBuilder = new StringBuilder();
 
-            var schema = GetSchema(originalColumn.Table.Schema);
+            var schema = this.GetSchema(originalColumn.Table.Schema);
 
             if (schema == null)
             {
@@ -83,7 +87,7 @@ namespace ReverseEngineer20.ReverseEngineer
                 return base.GenerateCandidateIdentifier(originalColumn);
             }
 
-            var columns = _customNameOptions
+            var columns = this._customNameOptions
                 .FirstOrDefault(s => s.SchemaName == schema.SchemaName)?
                 .Tables?
                 .FirstOrDefault(t => t.Name == originalColumn.Table.Name)?
@@ -108,45 +112,77 @@ namespace ReverseEngineer20.ReverseEngineer
             var originalSchema = foreignKey.PrincipalEntityType.GetSchema();
 
             //var originalTable = foreignKey.DeclaringEntityType.Scaffolding().TableName;
-            var schema = GetSchema(originalSchema);
+            var schema = this.GetSchema(originalSchema);
 
             if (schema == null)
             {
-                return base.GetDependentEndCandidateNavigationPropertyName(foreignKey);
+                baseName = base.GetDependentEndCandidateNavigationPropertyName(foreignKey);
             }
             else if (foreignKey.IsSelfReferencing())
             {
-                return base.GetDependentEndCandidateNavigationPropertyName(foreignKey);
+                baseName = base.GetDependentEndCandidateNavigationPropertyName(foreignKey);
             }
-            else if (schema.SchemaName == originalSchema)
+            else if (schema.SchemaName == originalSchema && schema.UseSchemaName)
             {
-                if (schema.UseSchemaName)
-                {
-                    return ToPascalCase(schema.SchemaName) + baseName;
-                }
-                return baseName;
+                baseName = ToPascalCase(schema.SchemaName) + baseName;
             }
             else
             {
-                return base.GetDependentEndCandidateNavigationPropertyName(foreignKey);
+                baseName = base.GetDependentEndCandidateNavigationPropertyName(foreignKey);
             }
+            
+            // Managae RegEx extraction
+            if (!String.IsNullOrWhiteSpace(_customOptions.ForeignKeyNameFormat))
+            {
+                var matcher = Regex.Match(baseName, this._customOptions.ForeignKeyNameFormat);
+
+                if (matcher != null && matcher.Success && matcher.Length == 2)
+                {
+                    return baseName.Remove(matcher.Captures[0].Index, matcher.Captures[0].Length);
+                }
+            }
+
+            // Done
+            return baseName;
+        }
+
+        public override string GetPrincipalEndCandidateNavigationPropertyName(IForeignKey foreignKey, string dependentEndNavigationPropertyName)
+        {
+            if (this._customOptions.UseInflectorForExternalNavigation)
+            {
+                var pluralizer = new InflectorPluralizer();
+                var pluralized = pluralizer.Pluralize(base.GetPrincipalEndCandidateNavigationPropertyName(foreignKey, dependentEndNavigationPropertyName));
+                return pluralized;
+            }
+            else if (this._customOptions.UseLegacyPluralizerForExternalNavigation)
+            {
+                var pluralizer = new LegacyInflectorPluralizer();
+                var pluralized = pluralizer.Pluralize(base.GetPrincipalEndCandidateNavigationPropertyName(foreignKey, dependentEndNavigationPropertyName));
+                return pluralized;
+            }
+            else
+            {
+                return base.GetPrincipalEndCandidateNavigationPropertyName(foreignKey, dependentEndNavigationPropertyName);
+            }
+
         }
 
         private Schema GetSchema(string originalSchema)
-            => _customNameOptions?
+            => this._customNameOptions?
                     .FirstOrDefault(x => x.SchemaName == originalSchema);
 
         private static string ToPascalCase(string value)
         {
+
             var candidateStringBuilder = new StringBuilder();
             var previousLetterCharInWordIsLowerCase = false;
             var isFirstCharacterInWord = true;
 
             foreach (var c in value)
             {
-                var isNotLetterOrDigit = !char.IsLetterOrDigit(c);
+                var isNotLetterOrDigit = !Char.IsLetterOrDigit(c);
                 if (isNotLetterOrDigit
-                    || (previousLetterCharInWordIsLowerCase && char.IsUpper(c)))
+                    || (previousLetterCharInWordIsLowerCase && Char.IsUpper(c)))
                 {
                     isFirstCharacterInWord = true;
                     previousLetterCharInWordIsLowerCase = false;
@@ -157,9 +193,9 @@ namespace ReverseEngineer20.ReverseEngineer
                 }
 
                 candidateStringBuilder.Append(
-                    isFirstCharacterInWord ? char.ToUpperInvariant(c) : char.ToLowerInvariant(c));
+                    isFirstCharacterInWord ? Char.ToUpperInvariant(c) : Char.ToLowerInvariant(c));
                 isFirstCharacterInWord = false;
-                if (char.IsLower(c))
+                if (Char.IsLower(c))
                 {
                     previousLetterCharInWordIsLowerCase = true;
                 }

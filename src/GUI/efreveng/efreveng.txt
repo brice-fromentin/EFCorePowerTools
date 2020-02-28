@@ -1,46 +1,49 @@
 {
-   "ConnectionString": "Data Source=.\\SQLEXPRESS;Initial Catalog=Cloudsense;Integrated Security=True",
-   "ContextClassName": "CloudsenseContext",
-   "CustomReplacers": null,
-   "Dacpac": null,
-   "DatabaseType": 3,
-   "DefaultDacpacSchema": null,
-   "DoNotCombineNamespace": false,
-   "IdReplace": false,
-   "IncludeConnectionString": false,
-   "OutputPath": "Models",
-   "OutputContextPath": "C:\\Code\\Context",
-   "ModelNamespace": "Modelos",
-   "ContextNamespace": "Context",
-   "ProjectPath": "C:\\Temp\\Test\\",
-   "ProjectRootNamespace": "ConsoleApp2",
-   "SelectedHandlebarsLanguage": 0,
-   "SelectedToBeGenerated": 0,
-   "Tables": [
-      {
-         "HasPrimaryKey": true,
-         "Name": "dbo.Clients"
-      },
-      {
-         "HasPrimaryKey": true,
-         "Name": "dbo.ClientsLogs"
-      },
-      {
-         "HasPrimaryKey": true,
-         "Name": "dbo.Domains"
-      },
-	  {
-         "HasPrimaryKey": false,
-         "Name": "dbo.BlogsView"
-      },
-      {
-         "HasPrimaryKey": true,
-         "Name": "dbo.Forests"
-      }
-   ],
-   "UseDatabaseNames": false,
-   "UseFluentApiOnly": true,
-   "UseHandleBars": true,
-   "UseInflector": true,
-   "UseLegacyPluralizer": false
+	"ConnectionString": "Data Source=.\\SQLEXPRESS;Initial Catalog=Cloudsense;Integrated Security=True",
+	"ContextClassName": "CloudsenseContext",
+	"CustomReplacers": null,
+	"Dacpac": null,
+	"DatabaseType": 3,
+	"DefaultDacpacSchema": null,
+	"DoNotCombineNamespace": false,
+	"IdReplace": false,
+	"IncludeConnectionString": false,
+	"OutputPath": "Models",
+	"OutputContextPath": "C:\\Code\\Context",
+	"ModelNamespace": "Modelos",
+	"ForeignKeyNameFormat": "Id(.*?)",
+	"UseInflectorForExternalNavigation": true,
+	"UseLegacyPluralizerForExternalNavigation": false,
+	"ContextNamespace": "Context",
+	"ProjectPath": "C:\\Temp\\Test\\",
+	"ProjectRootNamespace": "ConsoleApp2",
+	"SelectedHandlebarsLanguage": 0,
+	"SelectedToBeGenerated": 0,
+	"Tables": [
+		{
+			"HasPrimaryKey": true,
+			"Name": "dbo.Clients"
+		},
+		{
+			"HasPrimaryKey": true,
+			"Name": "dbo.ClientsLogs"
+		},
+		{
+			"HasPrimaryKey": true,
+			"Name": "dbo.Domains"
+		},
+		{
+			"HasPrimaryKey": false,
+			"Name": "dbo.BlogsView"
+		},
+		{
+			"HasPrimaryKey": true,
+			"Name": "dbo.Forests"
+		}
+	],
+	"UseDatabaseNames": false,
+	"UseFluentApiOnly": true,
+	"UseHandleBars": true,
+	"UseInflector": true,
+	"UseLegacyPluralizer": false
 }

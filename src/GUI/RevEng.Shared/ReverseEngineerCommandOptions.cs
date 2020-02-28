@@ -31,5 +31,8 @@ namespace ReverseEngineer20
         public bool UseLegacyPluralizer { get; set; }
         public bool DoNotCombineNamespace { get; set; }
         public bool UseSpatial { get; set; }
+        public string ForeignKeyNameFormat { get; set; }
+        public bool UseInflectorForExternalNavigation { get; set; }
+        public bool UseLegacyPluralizerForExternalNavigation { get; set; }
     }
 }
